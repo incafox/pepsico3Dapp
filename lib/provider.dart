@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,13 +15,19 @@ class ProveedorDatos extends ChangeNotifier {
   String _password = "";
   String _gpid = "";
   String _token = "";
+  String _fotoPerfil = "";
+  String _segundoNombre = "";
+  String _primerNombre = "";
+  String _tipoUsuario = "";
+  String _descripcion = "";
 // 1
 /* 
 {"error":"0","descripcion":"logeado con exito","user_id":"18",
 "user_name":"24782358743859","group_id":"0","first_name":"test",
 "last_name":"test","pais_id":null,"addedPassword":"0"}
 */
-  void validaGPID() async {
+  Future<String> validaGPID() async {
+    String prueba = "";
     Response response;
     Dio dio = new Dio();
     FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
@@ -32,6 +37,21 @@ class ProveedorDatos extends ChangeNotifier {
     Map<String, dynamic> mapa = jsonDecode(response.data.toString());
     print(response.data.toString());
 
+    if (mapa['error'] == "0") {
+      //si esta bien
+      this.userID = mapa['user_id'];
+      this.fotoPerfil = mapa['foto_perfil'];
+      this.paisID = mapa['pais_id'];
+      this.tipoUsuario = mapa['tipo_usuario'];
+      this.primerNombre = mapa['first_name'];
+      this.segundoNombre = mapa['last_name'];
+      this.addedPasword = mapa['addedPassword'];
+      this.token = mapa['token'];
+    } else {
+      //si no hay cuenta
+      this.descripcion = mapa['descripcion'];
+      this.addedPasword = mapa['added_password'];
+    }
     print("user_id : " + mapa['user_id']);
     print("user_name : " + mapa['user_name']);
     print("group_id : " + mapa['group_id']);
@@ -39,6 +59,7 @@ class ProveedorDatos extends ChangeNotifier {
     print("last_name : " + mapa['last_name']);
     print("pais_id : " + mapa['pais_id']);
     print("addedPassword : " + mapa['addedPassword']);
+    return prueba;
   }
 
 // 2
@@ -46,21 +67,26 @@ class ProveedorDatos extends ChangeNotifier {
 {"error":"0","descripcion":"Contrase\u00f1a Cambiado con \u00e9xito"}
 {"error":"1","descripcion":" Error al cambiar la  Contrase\u00f1a "}
  */
-  void completarPassword() async {
+  Future<String> completarPassword(String password, String password2) async {
+    String respuesta = "";
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
-    response = await dio.post(
-        "https://pepsicoapp.com/api/AppMovil/completarPassword",
-        data: formData);
 
-    Map<String, dynamic> mapa = jsonDecode(response.data.toString());
-    print(response.data.toString());
-
-    print("user_id : " + mapa['user_id']);
-    print("user_name : " + mapa['user_name']);
-
-    print(response.data.toString());
+    if (password == password2) {
+      // print("user_id : " + mapa['user_id']);
+      // print("password : " + password2);
+      print(response.data.toString());
+      FormData formData = new FormData.fromMap(
+          {"user_id": this.userID, "password": password, "token": this.token});
+      response = await dio.post(
+          "https://pepsicoapp.com/api/AppMovil/completarPassword",
+          data: formData);
+      Map<String, dynamic> mapa = jsonDecode(response.data.toString());
+      print(response.data.toString());
+    } else {
+      respuesta = "Las claves no son iguales";
+    }
+    return respuesta;
   }
 
 //3
@@ -71,8 +97,9 @@ class ProveedorDatos extends ChangeNotifier {
 
 {"error":"1","descripcion":"Acceso fallido. Por favor intente nuevamente"}
  */
-
-  void login() async {
+  Future<bool> login() async {
+    bool estado = false;
+    String respuesta = "";
     Response response;
     Dio dio = new Dio();
     FormData formData =
@@ -80,6 +107,17 @@ class ProveedorDatos extends ChangeNotifier {
     response = await dio.post("https://pepsicoapp.com/api/AppMovil/login",
         data: formData);
     print(response.data.toString());
+
+    Map<String, dynamic> mapa = jsonDecode(response.data.toString());
+    print(response.data.toString());
+    if (mapa["error"] == 0) {
+      //si todo esta bien, logeado con exito
+      respuesta = mapa["descripcion"];
+      estado = true;
+    } else {
+      respuesta = mapa['descripcion'];
+    }
+    return estado;
   }
 
 //4
@@ -90,14 +128,15 @@ class ProveedorDatos extends ChangeNotifier {
     {"id":"3","nombre":"CASA (Central America & South America)"}
   ]} 
 */
-  void getUnidadesComerciales() async {
+  Future<String> getUnidadesComerciales() async {
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
-    response = await dio.post(
-        "https://pepsicoapp.com/api/AppMovil/getUnidadesComerciales",
-        data: formData);
+    // FormData formData = new FormData.fromMap({"gpid": "lube});
+    response = await dio.get(
+      "https://pepsicoapp.com/api/AppMovil/getUnidadesComerciales",
+    );
     print(response.data.toString());
+    return response.data.toString();
   }
 
   // 5
@@ -109,14 +148,17 @@ class ProveedorDatos extends ChangeNotifier {
   ]}
  */
 
-  void getUnidadesOperacion() async {
+  Future<String> getUnidadesOperacion(String numero) async {
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
+    FormData formData = new FormData.fromMap(
+        {"idUnidadComercial": numero, "token": this.token});
     response = await dio.post(
         "https://pepsicoapp.com/api/AppMovil/getUnidadesOperacion",
         data: formData);
     print(response.data.toString());
+    print(response.data["id"].toString());
+    return response.data.toString();
   }
 
   // 6
@@ -127,30 +169,33 @@ class ProveedorDatos extends ChangeNotifier {
     {"id":"5","nombre":"Per\u00c3\u00ba"},
     {"id":"6","nombre":"Venezuela"}]}
    */
-  void getPaisesPorUnidadesOperacion() async {
+  Future<String> getPaisesPorUnidadesOperacion(String idUnidadOperacion) async {
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
+    FormData formData = new FormData.fromMap(
+        {"idUnidadOperacion": idUnidadOperacion, "token": this.token});
     response = await dio.post(
         "https://pepsicoapp.com/api/AppMovil/getpaisesByUnidadesOperacion",
         data: formData);
     print(response.data.toString());
+    return response.data.toString();
   }
 
   // 7
   /*
-
    */
-  void getTiendasPorPaisTipo() async {
+  Future<String> getTiendasPorPaisTipo(
+      String idTipoTienda, String idPais) async {
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
+    FormData formData = new FormData.fromMap(
+        {"idTipoTienda": idTipoTienda, "idPais": idPais, "token": this.token});
     response = await dio.post(
         "https://pepsicoapp.com/api/AppMovil/getTiendasByPaisTipo",
         data: formData);
     print(response.data.toString());
+    return response.data.toString();
   }
-
   // 8
   /*
   {"items":
@@ -161,16 +206,17 @@ class ProveedorDatos extends ChangeNotifier {
    
    {"items":[]}
    */
-  void getTiendaByID() async {
+  Future<String> getTiendaByID(String idTienda) async {
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
+    FormData formData =
+        new FormData.fromMap({"idTienda": idTienda, "token": this.token});
     response = await dio.post(
         "https://pepsicoapp.com/api/AppMovil/getTiendaByID",
         data: formData);
     print(response.data.toString());
+    return response.data.toString();
   }
-
   //gpid
   get gpid {
     return this._gpid;
@@ -215,5 +261,58 @@ class ProveedorDatos extends ChangeNotifier {
   set addedPasword(String cn) {
     this._addedPasword = cn;
   }
-  //
+
+  //Foto de perfil
+  get fotoPerfil {
+    return this._fotoPerfil;
+  }
+
+  set fotoPerfil(String cn) {
+    this._fotoPerfil = cn;
+  }
+
+//Foto de perfil
+  get paisID {
+    return this._paisID;
+  }
+
+  set paisID(String cn) {
+    this._paisID = cn;
+  }
+
+  //tipo usuario
+  get tipoUsuario {
+    return this._tipoUsuario;
+  }
+
+  set tipoUsuario(String cn) {
+    this._tipoUsuario = cn;
+  }
+
+  //primer nombre
+  get primerNombre {
+    return this._primerNombre;
+  }
+
+  set primerNombre(String cn) {
+    this._primerNombre = cn;
+  }
+
+  //Foto de perfil
+  get segundoNombre {
+    return this._segundoNombre;
+  }
+
+  set segundoNombre(String cn) {
+    this._segundoNombre = cn;
+  }
+
+  //Foto de perfil
+  get descripcion {
+    return this._descripcion;
+  }
+
+  set descripcion(String cn) {
+    this._descripcion = cn;
+  }
 }

@@ -533,12 +533,12 @@ class _CoverState extends State<Cover> {
             visible: true,
             child: Center(
                 child: Opacity(
-                  opacity: this._visivility,
-                                  child: Text(
-              widget.name,
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-                )),
+              opacity: this._visivility,
+              child: Text(
+                widget.name,
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            )),
           ),
           decoration: BoxDecoration(
               color: widget.color, borderRadius: BorderRadius.circular(15)),
