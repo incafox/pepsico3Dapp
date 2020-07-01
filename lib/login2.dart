@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () async {
                         // Navigator.pushNamed(context, '/');
                         provider.gpid = this.gpid.text;
-                        provider.validaGPID();
+                        //provider.validaGPID();
                         Navigator.push(
                           context,
                           // MaterialPageRoute(builder: (context) => Bienvenido()),
