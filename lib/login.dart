@@ -206,8 +206,8 @@ class _LoginPageState extends State<LoginPage> {
                     child: InkWell(
                       onTap: () async {
                         // Navigator.pushNamed(context, '/');
-                        provider.gpid =this.gpid.text;
-                        provider.validaGPID();
+                        // provider.gpid =this.gpid.text;
+                        String b = await provider.validaGPID("this.gpid.text");
                         
                         // if (provider.)
                         Navigator.push(
