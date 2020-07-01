@@ -5,26 +5,35 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+// import 'package:test/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:pepsico/main.dart';
-
+import 'package:pepsico/provider.dart';
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  test('Test de conexion api token', () async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    final ProveedorDatos datos = new ProveedorDatos();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    
+    //hace comprobacion 
+    String error = await datos.validaGPID("lubeck05@gmail.com");
+    //define 
+    expect(error, "0"); //0 existe 1 no existe
+    //hace login
+    bool err = await datos.login("lubeck05@gmail.com","Lolo7@");
+    expect(err, true);
+    //unidades comerciales 
+    await datos.getUnidadesComerciales();
+    
+    await datos.getUnidadesOperacion("3");
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await datos.getPaisesPorUnidadesOperacion("1");
+    // await 
+    await datos.getTiendasPorPaisTipo("1", "1");
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // await datos.getTiendaByID("23");
+
+    // expect(find.text('1'), findsOneWidget);
   });
 }
