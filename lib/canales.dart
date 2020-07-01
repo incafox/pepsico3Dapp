@@ -432,10 +432,6 @@ class _CanalesState extends State<Canales> {
                   color: Colors.purple,
                 ),
               ],
-              //              Cover(
-              //   name: "DSITRUBUTORS/WHSL",
-              //   color: Colors.purple,
-              // ),
             ),
           ),
           Padding(
