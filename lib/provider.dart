@@ -20,22 +20,31 @@ class ProveedorDatos extends ChangeNotifier {
   String _primerNombre = "";
   String _tipoUsuario = "";
   String _descripcion = "";
+
+
+  String pais_bandera= "";
+  String nombre_pais="";
+
+/*
+test = lubeck05@gmail.com, Lolo7@
+*/
+
 // 1
 /* 
 {"error":"0","descripcion":"logeado con exito","user_id":"18",
 "user_name":"24782358743859","group_id":"0","first_name":"test",
 "last_name":"test","pais_id":null,"addedPassword":"0"}
 */
-  Future<String> validaGPID() async {
-    String prueba = "";
+  Future<String> validaGPID(String gpidd) async {
+    this.gpid = gpidd;
     Response response;
     Dio dio = new Dio();
-    FormData formData = new FormData.fromMap({"gpid": "lubeck05@gmail.com"});
+    FormData formData = new FormData.fromMap({"gpid": this.gpid});
     response = await dio.post("https://pepsicoapp.com/api/AppMovil/validaGPID",
         data: formData);
 
     Map<String, dynamic> mapa = jsonDecode(response.data.toString());
-    print(response.data.toString());
+    // print(response.data.toString());
 
     if (mapa['error'] == "0") {
       //si esta bien
@@ -52,14 +61,14 @@ class ProveedorDatos extends ChangeNotifier {
       this.descripcion = mapa['descripcion'];
       this.addedPasword = mapa['added_password'];
     }
-    print("user_id : " + mapa['user_id']);
-    print("user_name : " + mapa['user_name']);
-    print("group_id : " + mapa['group_id']);
-    print("first_name : " + mapa['first_name']);
-    print("last_name : " + mapa['last_name']);
-    print("pais_id : " + mapa['pais_id']);
-    print("addedPassword : " + mapa['addedPassword']);
-    return prueba;
+    // print("user_id : " + mapa['user_id']);
+    // print("user_name : " + mapa['user_name']);
+    // print("group_id : " + mapa['group_id']);
+    // print("first_name : " + mapa['first_name']);
+    // print("last_name : " + mapa['last_name']);
+    // print("pais_id : " + mapa['pais_id']);
+    // print("addedPassword : " + mapa['addedPassword']);
+    return mapa['error'];
   }
 
 // 2
@@ -97,7 +106,9 @@ class ProveedorDatos extends ChangeNotifier {
 
 {"error":"1","descripcion":"Acceso fallido. Por favor intente nuevamente"}
  */
-  Future<bool> login() async {
+  Future<bool> login(String user, String clave) async {
+    this.gpid = user;
+    this.password = clave;
     bool estado = false;
     String respuesta = "";
     Response response;
@@ -106,13 +117,21 @@ class ProveedorDatos extends ChangeNotifier {
         new FormData.fromMap({"gpid": this.gpid, "password": this.password});
     response = await dio.post("https://pepsicoapp.com/api/AppMovil/login",
         data: formData);
-    print(response.data.toString());
+    // print(response.data.toString());
 
     Map<String, dynamic> mapa = jsonDecode(response.data.toString());
-    print(response.data.toString());
-    if (mapa["error"] == 0) {
+    // print(response.data.toString());
+    if (mapa["error"] == "0") {
       //si todo esta bien, logeado con exito
       respuesta = mapa["descripcion"];
+      this.token = mapa["token"];
+      this.fotoPerfil = mapa["foto_perfil"];
+      this.pais_bandera = mapa["pais_bandera"];
+      this._firstName = mapa["firtsName"];
+      this._lastName = mapa["lastName"];
+      this.userID = mapa["user_id"];
+      this.nombre_pais = mapa["nombre_pais"];
+
       estado = true;
     } else {
       respuesta = mapa['descripcion'];
@@ -132,9 +151,13 @@ class ProveedorDatos extends ChangeNotifier {
     Response response;
     Dio dio = new Dio();
     // FormData formData = new FormData.fromMap({"gpid": "lube});
-    response = await dio.get(
-      "https://pepsicoapp.com/api/AppMovil/getUnidadesComerciales",
-    );
+    // response = await dio.get(
+    //   "https://pepsicoapp.com/api/AppMovil/getUnidadesComerciales",
+    // );
+FormData formData =
+        new FormData.fromMap({"token":this.token});
+    response = await dio.post("https://pepsicoapp.com/api/AppMovil/getUnidadesComerciales",
+        data: formData);
     print(response.data.toString());
     return response.data.toString();
   }
@@ -157,7 +180,7 @@ class ProveedorDatos extends ChangeNotifier {
         "https://pepsicoapp.com/api/AppMovil/getUnidadesOperacion",
         data: formData);
     print(response.data.toString());
-    print(response.data["id"].toString());
+    // print(response.data["id"].toString());
     return response.data.toString();
   }
 
@@ -217,6 +240,24 @@ class ProveedorDatos extends ChangeNotifier {
     print(response.data.toString());
     return response.data.toString();
   }
+  
+  
+  Future<String> getTienda3D(String link)async{
+    Response response;
+    Dio dio = new Dio();
+    // FormData formData = 
+    //     new FormData.fromMap({"link":link,"token":this.token});
+    // response = await dio.post(
+    //   "request de descarga"
+    // );
+
+    //manage exception
+    //descargar aca, agregar external write
+    // permision y descarga dio
+  
+  }
+  
+  
   //gpid
   get gpid {
     return this._gpid;
